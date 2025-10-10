@@ -34,8 +34,6 @@ public class Main {
             System.out.println("Total events collected: " + events.size());
             // Now we check the equality and hashCode behavior
             check(events);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -51,9 +49,9 @@ public class Main {
         System.out.println("Total frames on top: " + framesOnTop.size() + ", unique: " + uniqueFrames.size());
 
         RecordedFrame firstFrame = framesOnTop.get(0);
-        for (RecordedFrame frame : uniqueFrames.stream().limit(10).toList()) {
+        for (RecordedFrame frame : framesOnTop.stream().limit(10).toList()) {
             System.out.println("Method: " + frame.getMethod().getType().getName() + "." + frame.getMethod().getName() +
-                    " at " + frame.getLineNumber() + ", hashCode: " + frame.hashCode() + ", equal to first frame " + frame.equals(firstFrame));
+                               " at " + frame.getLineNumber() + ", hashCode: " + frame.hashCode() + ", equal to first frame " + frame.equals(firstFrame));
         }
 
         // Now with the custom built wrapper

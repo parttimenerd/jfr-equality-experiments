@@ -13,17 +13,15 @@ import java.lang.reflect.Field;
  * <p>
  * Downside of this approach: Users need to pass <code>--add-opens jdk.jfr/jdk.jfr.consumer=ALL-UNNAMED</code>
  * to the JVM to allow access to the package private fields.
- * @param object
+ * <p/>
+ * Also: Objects with the same content but different types are considered equal.
  */
 public record Wrapper(RecordedObject object) {
 
-    private static final Field objectContextField;
     private static final Field objectsField;
 
     static {
         try {
-            objectContextField = RecordedObject.class.getDeclaredField("objectContext");
-            objectContextField.setAccessible(true);
             objectsField = RecordedObject.class.getDeclaredField("objects");
             objectsField.setAccessible(true);
         } catch (NoSuchFieldException e) {
@@ -34,7 +32,7 @@ public record Wrapper(RecordedObject object) {
     @Override
     public int hashCode() {
         try {
-            return objectContextField.get(object).hashCode() ^ objectsField.get(object).hashCode();
+            return objectsField.get(object).hashCode();
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -44,10 +42,9 @@ public record Wrapper(RecordedObject object) {
     public boolean equals(Object obj) {
         try {
             return this == obj || (obj instanceof Wrapper other && (
-                    (objectContextField.get(object).equals(objectContextField.get(other.object)) &&
+                    object == other.object ||
                      objectsField.get(object).equals(objectsField.get(other.object)))
-                    || object.equals(other.object)
-            ));
+            );
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
